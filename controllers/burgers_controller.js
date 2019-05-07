@@ -2,46 +2,56 @@ var express = require("express");
 
 var router = express.Router();
 
-var burger = require("../models/burger.js");
+var db = require("../models");
 
+//GET route returns all items in the DB
 router.get("/", function (req, res) {
-    burger.all(function (data) {
-        var hbsObject = {
-            burgers: data
-        };
-        console.log(hbsObject);
-        res.render("index", hbsObject);
 
-    });
+  db.Burger.findAll({}).then(function (data) {
+    var hbsObject = {
+      burgers: data
+    };
+    res.render("index", hbsObject);
+  });
 });
 
 router.post("/api/burger/", function (req, res) {
-    burger.insert(
-    [
-        "burger_name", "devoured"
-    ], [
-            req.body.burger_name, req.body.devoured
-        ], function (result) {
-            res.json({ id: result.insertId });
-        }
-   );
+
+  db.Burger
+    .create({
+      burger_name: req.body.burger_name,
+      devoured: req.body.devoured
+    })
+    .then(function (result) {
+
+      res.json({ id: result.insertId });
+
+    })
+    .catch(function (err) {
+      res.json(err);
+    });
 
 });
 
 
 router.put("/api/burger/:id", function (req, res) {
-    var burgboyID = "id = " + req.params.id;
 
-    burger.update({
-        devoured: req.body.devoured
-      }, burgboyID, function(result) {
-        if (result.changedRows == 0) {
-          // If no rows were changed, then the ID must not exist, so 404
-          return res.status(404).end();
-        } else {
-          res.status(200).end();
-        }
-      });
+  db.Burger.update({
+    devoured: req.body.devoured
+  }, {
+      where: {
+        id: req.params.id
+      }
+    }).then(function (result) {
+      if (result.changedRows == 0) {
+        return res.status(404).end();
+      } else {
+        res.status(200).end();
+      }
+    })
+    .catch(function (err) {
+      res.json(err);
+    });
 });
 
 

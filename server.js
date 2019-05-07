@@ -27,3 +27,13 @@ db.sequelize.sync().then(function () {
     console.log("Server listening on: http://localhost:" + PORT);
   })
 });
+
+/*
+To-Do
+
+Update controller file with sequelize methods
+associate customer model with burger model and create foreign key relationship
+Set values of burger and customre name to null
+order options by sort method
+
+*/
